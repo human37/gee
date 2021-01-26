@@ -1,3 +1,6 @@
+mod commands;
+
+
 fn main() {
-    println!("Hello, world!");
+    commands::find_file("~/.vimrc");
 }

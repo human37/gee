@@ -11,5 +11,7 @@ Cargo.lock
 
 
 # Added by cargo
-
 /target
+
+# Mac trash
+.DS_Store
