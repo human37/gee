@@ -1,5 +1,5 @@
 use spinners::{Spinner, Spinners};
-use std::{env::set_current_dir, fs::read_to_string, path::Path, thread::sleep, time::Duration};
+use std::{env::set_current_dir, fs::read_to_string, path::Path};
 mod commands;
 
 fn set_home_dir() {
@@ -9,8 +9,7 @@ fn set_home_dir() {
 
 fn run_command(loading_msg: &str) {
     let sp = Spinner::new(Spinners::Dots, loading_msg.into());
-    sleep(Duration::from_secs(1));
-    commands::clone_repo("git@github.com:human37/stockbot.git");
+    commands::clone_repo("git@github.com:human37/stockbot.git").expect("error");
     sp.stop();
 }
 
