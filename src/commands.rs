@@ -3,9 +3,9 @@ use std::fs::File;
 use std::process::{Command, Stdio};
 use std::io::prelude::*; 
 
+// PARAMS: name = the url to the repository
 // runs a 'git clone' command
 // clones the repo into .gee/tmp/
-// the 'name' parameter is the url to the repository
 // it also logs the output to .gee/log.txt
 pub fn clone_repo(name: &str) -> std::io::Result<()> {
 	let mut dir = String::from(".gee/tmp/");
@@ -33,6 +33,7 @@ pub fn clone_repo(name: &str) -> std::io::Result<()> {
     Ok(())
 }
 
+// PARAMS: name = the name of the repository being recorded
 // records meta data about the repository
 // writes it to .gee/config.json
 fn write_to_json(name: &str) {
@@ -41,6 +42,7 @@ fn write_to_json(name: &str) {
 	println!("json data: {}", data);
 }
 
+// PARAMS: none
 // runs a 'cat' command
 // prints the output of .gee/log.txt
 fn show_logs() {
