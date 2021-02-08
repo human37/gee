@@ -19,18 +19,12 @@ pub fn clone_repo(name: &str) -> std::io::Result<()> {
 		Err(why) => panic!("error executing process: {}", why),
 		Ok(process) => process,
 	};
-	// records this clone in .gee/config.json
 	write_to_json(name);
-	// checks the exit status code for success
 	if process.status.success() {
 		println!("success.")
 	} else {
 		println!("error.");
-		// assigns the process's output to string, logs and prints the error
-		let output = String::from_utf8_lossy(&process.stderr);
-		let mut file = File::create(".gee/logs.txt")?;
-		file.write_all(output.as_bytes())?;
-		show_logs();
+		log_error(process).expect("logging error failed.")
 	}
 	Ok(())
 }
@@ -48,18 +42,31 @@ fn write_to_json(name: &str) {
 /// prints the output of .gee/log.txt
 fn show_logs() {
 	println!("\nshowing logs below: ");
-	let mut output = String::new();
 	let process = match Command::new("cat")
 		.arg(".gee/logs.txt")
 		.stderr(Stdio::piped())
 		.stdout(Stdio::piped())
-		.spawn()
+		.output()
 	{
 		Err(why) => panic!("error executing process: {}", why),
 		Ok(process) => process,
 	};
-	match process.stdout.unwrap().read_to_string(&mut output) {
-		Err(why) => panic!("error reading output: {}", why),
-		Ok(_) => print!("{}", output),
+
+	if process.status.success() {
+		let output = String::from_utf8_lossy(&process.stdout);
+		println!("{}", output);
+	} else {
+		println!("error.");
+		log_error(process).expect("logging error failed.");
 	}
+}
+
+/// PARAMS: process = a pointer to the process that had a non-zero exit status code.
+/// it writes the stderr to .gee/logs.txt, and then prints the log.
+fn log_error(process: std::process::Output) -> std::io::Result<()> {
+	let output = String::from_utf8_lossy(&process.stderr);
+	let mut file = File::create(".gee/logs.txt")?;
+	file.write_all(output.as_bytes())?;
+	show_logs();
+	Ok(())
 }
