@@ -3,10 +3,10 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::process::{Command, Stdio};
 
-// PARAMS: name = the url to the repository
-// runs a 'git clone' command
-// clones the repo into .gee/tmp/
-// it also logs the output to .gee/log.txt
+/// PARAMS: name = the url to the repository.
+/// runs a 'git clone' command.
+/// clones the repo into .gee/tmp/, and
+/// it also logs the output to .gee/log.txt
 pub fn clone_repo(name: &str) -> std::io::Result<()> {
 	let mut dir = String::from(".gee/tmp/");
 	dir.push_str(name);
@@ -20,7 +20,7 @@ pub fn clone_repo(name: &str) -> std::io::Result<()> {
 		Err(why) => panic!("error executing process: {}", why),
 		Ok(process) => process,
 	};
-	// unwraps output from the child process
+	// unwraps output, and stores in the 'output' string. 
 	match process.stderr.unwrap().read_to_string(&mut output) {
 		Err(why) => panic!("error reading output: {}", why),
 		Ok(_) => (print!("\n")),
@@ -34,18 +34,18 @@ pub fn clone_repo(name: &str) -> std::io::Result<()> {
 	Ok(())
 }
 
-// PARAMS: name = the name of the repository being recorded
-// records meta data about the repository
-// writes it to .gee/config.json
+/// PARAMS: name = the name of the repository being recorded.
+/// records meta data about the repository, and
+/// writes it to .gee/config.json
 fn write_to_json(name: &str) {
 	let mut data = json::JsonValue::new_object();
 	data["repositories"] = name.into();
 	println!("json data: {}", data);
 }
 
-// PARAMS: none
-// runs a 'cat' command
-// prints the output of .gee/log.txt
+/// PARAMS: none
+/// runs a 'cat' command
+/// prints the output of .gee/log.txt
 fn show_logs() {
 	println!("\nshowing logs below: \n");
 	let mut output = String::new();
