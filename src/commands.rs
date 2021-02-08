@@ -1,7 +1,7 @@
 use json;
 use std::fs::File;
+use std::io::prelude::*;
 use std::process::{Command, Stdio};
-use std::io::prelude::*; 
 
 // PARAMS: name = the url to the repository
 // runs a 'git clone' command
@@ -15,14 +15,15 @@ pub fn clone_repo(name: &str) -> std::io::Result<()> {
 		.args(&["clone", "--progress", name, &dir])
 		.stderr(Stdio::piped())
 		.stdout(Stdio::piped())
-		.spawn() {
-			Err(why) => panic!("error executing process: {}", why),
-			Ok(process) => process 
+		.spawn()
+	{
+		Err(why) => panic!("error executing process: {}", why),
+		Ok(process) => process,
 	};
 	// unwraps output from the child process
 	match process.stderr.unwrap().read_to_string(&mut output) {
 		Err(why) => panic!("error reading output: {}", why),
-        Ok(_) => (print!("\n")),
+		Ok(_) => (print!("\n")),
 	}
 	// records this clone in .gee/config.json
 	write_to_json(name);
@@ -30,7 +31,7 @@ pub fn clone_repo(name: &str) -> std::io::Result<()> {
 	let mut file = File::create(".gee/logs.txt")?;
 	file.write_all(output.as_bytes())?;
 	show_logs();
-    Ok(())
+	Ok(())
 }
 
 // PARAMS: name = the name of the repository being recorded
@@ -52,12 +53,13 @@ fn show_logs() {
 		.arg(".gee/logs.txt")
 		.stderr(Stdio::piped())
 		.stdout(Stdio::piped())
-		.spawn() {
-			Err(why) => panic!("error executing process: {}", why),
-			Ok(process) => process
+		.spawn()
+	{
+		Err(why) => panic!("error executing process: {}", why),
+		Ok(process) => process,
 	};
 	match process.stdout.unwrap().read_to_string(&mut output) {
 		Err(why) => panic!("error reading output: {}", why),
-        Ok(_) => print!("{}", output),
+		Ok(_) => print!("{}", output),
 	}
 }
