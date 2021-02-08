@@ -10,27 +10,28 @@ use std::process::{Command, Stdio};
 pub fn clone_repo(name: &str) -> std::io::Result<()> {
 	let mut dir = String::from(".gee/tmp/");
 	dir.push_str(name);
-	let mut output = String::new();
 	let process = match Command::new("git")
 		.args(&["clone", "--progress", name, &dir])
 		.stderr(Stdio::piped())
 		.stdout(Stdio::piped())
-		.spawn()
+		.output()
 	{
 		Err(why) => panic!("error executing process: {}", why),
 		Ok(process) => process,
 	};
-	// unwraps output, and stores in the 'output' string. 
-	match process.stderr.unwrap().read_to_string(&mut output) {
-		Err(why) => panic!("error reading output: {}", why),
-		Ok(_) => (print!("\n")),
-	}
 	// records this clone in .gee/config.json
 	write_to_json(name);
-	// logs the output to logs.txt
-	let mut file = File::create(".gee/logs.txt")?;
-	file.write_all(output.as_bytes())?;
-	show_logs();
+	// checks the exit status code for success
+	if process.status.success() {
+		println!("success.")
+	} else {
+		println!("error.");
+		// assigns the process's output to string, logs and prints the error
+		let output = String::from_utf8_lossy(&process.stderr);
+		let mut file = File::create(".gee/logs.txt")?;
+		file.write_all(output.as_bytes())?;
+		show_logs();
+	}
 	Ok(())
 }
 
@@ -40,14 +41,13 @@ pub fn clone_repo(name: &str) -> std::io::Result<()> {
 fn write_to_json(name: &str) {
 	let mut data = json::JsonValue::new_object();
 	data["repositories"] = name.into();
-	println!("json data: {}", data);
 }
 
-/// PARAMS: none
-/// runs a 'cat' command
+/// PARAMS: none.
+/// runs a 'cat' command, and
 /// prints the output of .gee/log.txt
 fn show_logs() {
-	println!("\nshowing logs below: \n");
+	println!("\nshowing logs below: ");
 	let mut output = String::new();
 	let process = match Command::new("cat")
 		.arg(".gee/logs.txt")

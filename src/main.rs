@@ -28,5 +28,5 @@ fn read_configurations() {
 fn main() {
     set_home_dir();
     read_configurations();
-    run_command("loading...");
+    run_command("loading...  ");
 }
