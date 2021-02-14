@@ -16,17 +16,8 @@ fn run_command(loading_msg: &str) {
     sp.stop();
 }
 
-/// reads the contents of .geerc (if it exists)
-/// in order to load in user specific configurations
-fn read_configurations() {
-    println!("in file {}", ".geerc");
-    let contents = read_to_string(".geerc").expect("something went wrong reading the file");
-    println!("with text:\n{}", contents);
-}
-
 /// entrypoint to gee
 fn main() {
     set_home_dir();
-    read_configurations();
     run_command("loading...  ");
 }
