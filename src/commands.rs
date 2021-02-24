@@ -1,17 +1,23 @@
 use serde::{Deserialize, Serialize};
-use std::convert::TryInto;
-use std::fs::File;
-use std::io::prelude::*;
-use std::io::{BufRead, BufReader};
-use std::process::{Command, Stdio};
+use std::{
+	convert::TryInto, fs::File, io::prelude::*, io::BufRead, io::BufReader, process::Command,
+	process::Stdio, path::Path
+};
 
 #[derive(Deserialize, Serialize)]
 struct Repo {
 	url: String,
+	index: usize,
+}
+
+impl PartialEq for Repo {
+	fn eq(&self, other: &Self) -> bool {
+		return &self.url == &other.url;
+	}
 }
 
 struct Config {
-	qsize: i32,
+	qsize: usize,
 }
 
 /// PARAMS: url = the url of the repository being recorded.
@@ -21,6 +27,7 @@ pub fn write_data(url: &str) -> std::io::Result<()> {
 	let mut repositories = read_in_data();
 	repositories.push(Repo {
 		url: url.to_string(),
+		index: repositories.len() + 1,
 	});
 	let metadata = serde_json::to_string(&repositories)?;
 	let mut file = File::create(".gee/metadata.json")?;
@@ -37,21 +44,39 @@ fn read_in_data() -> Vec<Repo> {
 		let file = File::open(".gee/metadata.json").expect("could not open the file metadata.json");
 		let repositories: Vec<Repo> =
 			serde_json::from_reader(file).expect("could not deserialize metadata.json");
-		return repositories;
+		return repositories
 	} else {
 		File::create(".gee/metadata.json").expect("could not open the file metadata.json");
 		let repositories: Vec<Repo> = Vec::new();
-		return repositories;
+		return repositories
 	}
 }
 
+fn manage_repo_installations(name: &str) {
+	let config: Config = parse_conf();
+	if file_exists(".gee/metadata.json") {
+		let repositories: Vec<Repo> = read_in_data();
+		let repo = Repo {
+			url: name.to_string(),
+			index: 0,
+		};
+		if repositories.contains(&repo) {
+			println!("already have this repository cloned!\n");
+			return
+		}
+		if repositories.len() >= config.qsize.try_into().unwrap() {
+			remove_repo(&repositories[0].url).expect("failed to remove repository");
+			println!("just removed {}\n", repositories[0].url)
+		}
+	}
+}
 
 /// PARAMS: name = the url to the repository.
 /// runs a 'git clone' command.
 /// clones the repo into .gee/tmp/, and
 /// it also logs the output to .gee/log.txt
 pub fn clone_repo(name: &str) -> std::io::Result<()> {
-	parse_conf();
+	manage_repo_installations(name);
 	let mut dir = String::from(".gee/tmp/");
 	dir.push_str(name);
 	let process = match Command::new("git")
@@ -130,16 +155,8 @@ fn log_error(process: std::process::Output) -> std::io::Result<()> {
 /// it will return true if the file exists,
 /// and false if the file does not exists.
 fn file_exists(path: &str) -> bool {
-	let process = match Command::new("cat")
-		.arg(path)
-		.stderr(Stdio::piped())
-		.stdout(Stdio::piped())
-		.output()
-	{
-		Err(why) => panic!("error executing process: {}", why),
-		Ok(process) => process,
-	};
-	if process.status.success() {
+	let file = Path::new(path);
+	if file.is_file() {
 		return true;
 	} else {
 		return false;
@@ -161,13 +178,16 @@ fn parse_conf() -> Config {
 			let key = split_line.next().expect("failed to parse the .geerc file");
 			let value = split_line.next().expect("failed to parse the .geerc file");
 			if key == "qsize" {
-				let value: i32 = value
+				let value: usize = value
 					.trim()
 					.parse()
 					.expect("failed to convert &str value to i32");
 				config.qsize = value;
 			} else {
-				println!("\nunknown key: '{}' found in .geerc, now using default configurations.", key);
+				println!(
+					"\nunknown key: '{}' found in .geerc, now using default configurations.",
+					key
+				);
 			}
 		}
 	}
