@@ -1,5 +1,5 @@
 # gee
-Repository manager and automation tool written in rust
+Repository manager and automation tool written in rust.
 
 ### Problem
 The problem I have is managing where I clone repositories I find on github. I hate having to remember the directory I cloned something, especially when I am done checking it out and I have to remember to delete it from its specific directory also. I also like checking out lots of git repositories, and managing storage on my computer can become an issue after some time.
