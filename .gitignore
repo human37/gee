@@ -15,3 +15,9 @@ Cargo.lock
 
 # Mac trash
 .DS_Store
+
+# Symbolic Links for faster development
+.gee
+
+# Environment stuff
+.vscode

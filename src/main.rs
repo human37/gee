@@ -1,7 +1,7 @@
+use crate::gee::Commands;
 use spinners::{Spinner, Spinners};
 use std::{env::set_current_dir, path::Path};
-mod commands;
-
+mod gee;
 /// sets the working directory to the user's home directory
 fn set_home_dir() {
     let root = Path::new("/Users/ammont");
@@ -12,10 +12,14 @@ fn set_home_dir() {
 /// shows a loading spinner while the command is running
 fn run_command(loading_msg: &str) {
     let sp = Spinner::new(Spinners::Dots, loading_msg.into());
-    commands::clone_repo("git@github.com:human37/gee.git").expect("error");
-    commands::clone_repo("git@github.com:human37/stockbot.git").expect("error");
-    commands::clone_repo("git@github.com:human37/ppm_editor.git").expect("error");
-    commands::clone_repo("git@github.com:human37/lyrics_microservice.git").expect("error");
+
+    let mut g = <gee::Gee>::new();
+    g.init();
+    g.clone_repo("git@github.com:human37/gee.git")
+        .expect("error");
+    g.clone_repo("git@github.com:human37/stockbot.git").expect("error");
+    g.clone_repo("git@github.com:human37/ppm_editor.git").expect("error");
+    g.clone_repo("git@github.com:human37/lyrics_microservice.git").expect("error");
     sp.stop();
 }
 
