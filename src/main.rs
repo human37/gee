@@ -1,4 +1,3 @@
-use crate::gee::Commands;
 use spinners::{Spinner, Spinners};
 use std::{env::set_current_dir, path::Path};
 mod gee;
@@ -13,13 +12,18 @@ fn set_home_dir() {
 fn run_command(loading_msg: &str) {
     let sp = Spinner::new(Spinners::Dots, loading_msg.into());
 
-    let mut g = <gee::Gee>::new();
+    let mut g = gee::Gee::new();
     g.init();
     g.clone_repo("git@github.com:human37/gee.git")
         .expect("error");
-    g.clone_repo("git@github.com:human37/stockbot.git").expect("error");
-    g.clone_repo("git@github.com:human37/ppm_editor.git").expect("error");
-    g.clone_repo("git@github.com:human37/lyrics_microservice.git").expect("error");
+    g.clone_repo("git@github.com:human37/stockbot.git")
+        .expect("error");
+    g.clone_repo("git@github.com:human37/ppm_editor.git")
+        .expect("error");
+    g.clone_repo("git@github.com:human37/lyrics_microservice.git")
+        .expect("error");
+    g.clone_repo("git@github.com:evad1n/F-sharp.git")
+        .expect("error");
     sp.stop();
 }
 
