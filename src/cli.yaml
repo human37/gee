@@ -1,0 +1,19 @@
+name: gee
+version: "alpha"
+author: Ammon Taylor <ammonx9@gmail.com>
+about: CLI repository manager and automation tool written in rust.
+args:
+  - clone:
+      short: c
+      long: clone
+      value_name: URL
+      help: the url of the repository you would like to clone 
+      takes_value: true
+subcommands:
+  - clone:
+      about: clones a reposity and pushes it on the queue
+      args:
+        -url:
+          help: the url of the repository 
+          takes_value: true
+
