@@ -1,22 +1,16 @@
 mod gee;
 use clap::{load_yaml, App};
 
-
 fn main() {
-
-    let yaml = load_yaml!("cli.yaml");
-    let m = App::from(yaml).get_matches();
-
-    if let Some(clone) = m.value_of("clone") {
-        match clone {
-            "vi" => println!("You are using vi"),
-            "emacs" => println!("You are using emacs..."),
-            _ => unreachable!(),
-        }
-    } else {
-        println!("--clone <CLONE> wasn't used...")
-    }
-
     gee::utils::set_home_dir();
-    gee::utils::test_run_command("loading...  ");
+    gee::utils::init_file_system().expect("failed to initialize filesytem.");
+    let mut g = gee::Gee::new();
+    g.init();
+    let yaml = load_yaml!("cli.yaml");
+    let matches = App::from(yaml).get_matches();
+    if let Some(url) = matches.subcommand_matches("clone") {
+        g.clone_repo(url.value_of("url").unwrap())
+            .expect("could not clone repository");
+    }
+    gee::utils::show_logs();
 }

@@ -1,7 +1,7 @@
 use super::{utils, Config, Gee, Repo};
 use std::{
-    collections::VecDeque, convert::TryInto, fs::create_dir, fs::File, io::prelude::*, io::BufRead,
-    io::BufReader, process::Command, process::Stdio,
+    collections::VecDeque, convert::TryInto, fs::File, io::prelude::*, io::BufRead, io::BufReader,
+    io::Result, process::Command, process::Stdio,
 };
 
 impl Gee {
@@ -26,9 +26,6 @@ impl Gee {
                 File::open(".gee/metadata.json").expect("could not open the file metadata.json");
             self.repositories =
                 serde_json::from_reader(file).expect("could not deserialize metadata.json");
-        } else {
-            create_dir(".gee/").expect("could not create the .gee directory");
-            File::create(".gee/metadata.json").expect("could not open the file metadata.json");
         }
     }
 
@@ -46,17 +43,16 @@ impl Gee {
                 let mut split_line = line.split_whitespace();
                 let key = split_line.next().expect("failed to parse the .geerc file");
                 let value = split_line.next().expect("failed to parse the .geerc file");
-                if key == "qsize" {
+                if key == "queue_size" {
                     let value: usize = value
                         .trim()
                         .parse()
                         .expect("failed to convert &str value to i32");
                     self.config.queue_size = value;
                 } else {
-                    println!(
-                        "unknown key: '{}' found in .geerc, now using default configurations.",
-                        key
-                    );
+                    let mut output = "[ err ] unknown key: ".to_owned();
+                    output.push_str(key);
+                    output.push_str(" found in file .geerc, now using default configurations");
                 }
             }
         }
@@ -65,7 +61,7 @@ impl Gee {
     /// PARAMS: url = the url of the repository being recorded.
     /// records meta data about the repository, and
     /// writes it to .gee/metadata.json
-    fn write_data(&mut self) -> std::io::Result<()> {
+    fn write_data(&mut self) -> Result<()> {
         let metadata = serde_json::to_string(&self.repositories)?;
         let mut file = File::create(".gee/metadata.json")?;
         file.write_all(metadata.as_bytes())?;
@@ -82,16 +78,19 @@ impl Gee {
                 url: name.to_string(),
             };
             if self.repositories.contains(&repo) {
-                println!("already have this repository cloned!\n");
+                utils::log_info("[ info ] this repository is already on the queue").expect("failed to log info");
                 return false;
             }
-            while self.repositories.len() > self.config.queue_size.try_into().unwrap() {
+            while self.repositories.len() >= self.config.queue_size.try_into().unwrap() {
                 let repo = self
                     .repositories
                     .pop_back()
                     .expect("could not pop last repo off queue");
                 utils::remove_repo(&repo.url).expect("failed to remove repository");
-                println!("just removed {}\n", repo.url);
+                let mut output: String = "[ info ] just popped ".to_owned();
+                output.push_str(&repo.url);
+                output.push_str(" off the queue");
+                utils::log_info(&output).expect("failed to log info");
             }
         }
         return true;
@@ -101,7 +100,7 @@ impl Gee {
     /// runs a 'git clone' command.
     /// clones the repo into .gee/tmp/, and
     /// it also logs the output to .gee/log.txt
-    pub fn clone_repo(&mut self, name: &str) -> std::io::Result<()> {
+    pub fn clone_repo(&mut self, name: &str) -> Result<()> {
         if self.manage_repo_installations(name) {
             let mut dir = String::from(".gee/tmp/");
             dir.push_str(name);
@@ -119,10 +118,10 @@ impl Gee {
                     url: name.to_string(),
                 });
                 self.write_data().expect("recording git clone failed.");
-                println!("success.")
+                utils::log_info("[ info ] cloning repository was successful")
+                    .expect("logging info failed.");
             } else {
-                println!("error.");
-                utils::log_error(process).expect("logging error failed.");
+                utils::log_process_error(process).expect("logging process error failed");
             }
         }
         Ok(())
