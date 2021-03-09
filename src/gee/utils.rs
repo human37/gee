@@ -1,6 +1,6 @@
 use std::{
     env::set_current_dir, fs::create_dir, fs::OpenOptions, io::Result, io::Write, path::Path,
-    process::Command, process::Stdio,
+    process::Command, process::Stdio, env::var,
 };
 
 const LOG_FILE: &'static str = ".gee/logs.txt";
@@ -104,7 +104,8 @@ pub fn remove_file(path: &str) -> Result<()> {
 /// PARAMS: none.
 /// sets the working directory to the user's home directory.
 pub fn set_home_dir() {
-    let root = Path::new("/Users/ammont");
+    let home_env = var("HOME").expect("could not fetch the user's HOME env variable.");
+    let root = Path::new(&home_env);
     assert!(set_current_dir(&root).is_ok());
 }
 
