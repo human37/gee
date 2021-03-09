@@ -1,6 +1,6 @@
 use std::{
-    env::set_current_dir, fs::create_dir, fs::OpenOptions, io::Write, path::Path, process::Command,
-    process::Stdio, io::Result
+    env::set_current_dir, fs::create_dir, fs::OpenOptions, io::Result, io::Write, path::Path,
+    process::Command, process::Stdio,
 };
 
 const LOG_FILE: &'static str = ".gee/logs.txt";
@@ -20,6 +20,7 @@ pub fn dir_exists(path: &str) -> bool {
     let dir = Path::new(path);
     dir.is_dir()
 }
+
 /// PARAMS: process = a pointer to the process
 /// that had a non-zero exit status code.
 /// it writes the stderr to .gee/logs.txt, and then prints the log.
@@ -36,6 +37,9 @@ pub fn log_process_error(process: std::process::Output) -> Result<()> {
     Ok(())
 }
 
+/// PARAMS: info = a string of the message you would
+/// liked logged. writes the output to the file
+/// at the path .gee/logs.txt.
 pub fn log_info(info: &str) -> Result<()> {
     match OpenOptions::new().create(true).append(true).open(LOG_FILE) {
         Ok(ref mut file) => {
@@ -63,7 +67,7 @@ pub fn show_logs() {
     };
     if process.status.success() {
         let output = String::from_utf8_lossy(&process.stdout);
-        println!("{}", output)
+        print!("{}", output)
     } else {
         log_process_error(process).expect("logging error failed.")
     }
@@ -105,6 +109,8 @@ pub fn set_home_dir() {
 }
 
 /// PARAMS: none.
+/// if the necessary filesystem is not in place,
+/// create the necessary files / directories. 
 pub fn init_file_system() -> Result<()> {
     if !dir_exists(".gee") {
         create_dir(".gee")?;
@@ -114,23 +120,3 @@ pub fn init_file_system() -> Result<()> {
     }
     Ok(())
 }
-
-// calls the 'clone_repo' function, and also
-// shows a loading spinner while the command is running
-// pub fn test_run_command(loading_msg: &str) {
-//     let sp = Spinner::new(Spinners::Dots, loading_msg.into());
-
-//     let mut g = Gee::new();
-//     g.init();
-//     g.clone_repo("git@github.com:human37/gee.git")
-//         .expect("error");
-//     g.clone_repo("git@github.com:human37/stockbot.git")
-//         .expect("error");
-//     g.clone_repo("git@github.com:human37/ppm_editor.git")
-//         .expect("error");
-//     g.clone_repo("git@github.com:human37/lyrics_microservice.git")
-//         .expect("error");
-//     g.clone_repo("git@github.com:evad1n/F-sharp.git")
-//         .expect("error");
-//     sp.stop();
-// }

@@ -3,7 +3,7 @@ use clap::{load_yaml, App};
 
 fn main() {
     gee::utils::set_home_dir();
-    gee::utils::init_file_system().expect("failed to initialize filesytem.");
+    gee::utils::init_file_system().expect("failed to initialize filesystem.");
     let mut g = gee::Gee::new();
     g.init();
     let yaml = load_yaml!("cli.yaml");
