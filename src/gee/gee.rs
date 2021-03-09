@@ -50,9 +50,10 @@ impl Gee {
                         .expect("failed to convert &str value to i32");
                     self.config.queue_size = value;
                 } else {
-                    let mut output = "[ err ] unknown key: ".to_owned();
+                    let mut output = "unknown key: ".to_owned();
                     output.push_str(key);
-                    output.push_str(" found in file .geerc, now using default configurations");
+                    output.push_str(" found in file .geerc, now using default configurations.");
+                    println!("{}", output);
                 }
             }
         }
@@ -78,7 +79,7 @@ impl Gee {
                 url: name.to_string(),
             };
             if self.repositories.contains(&repo) {
-                utils::log_info("[ info ] this repository is already on the queue").expect("failed to log info");
+                utils::log_info("this repository is already on the queue.").expect("failed to log info");
                 return false;
             }
             while self.repositories.len() >= self.config.queue_size.try_into().unwrap() {
@@ -87,9 +88,9 @@ impl Gee {
                     .pop_back()
                     .expect("could not pop last repo off queue");
                 utils::remove_repo(&repo.url).expect("failed to remove repository");
-                let mut output: String = "[ info ] just popped ".to_owned();
+                let mut output: String = "just popped ".to_owned();
                 output.push_str(&repo.url);
-                output.push_str(" off the queue");
+                output.push_str(" off the queue.");
                 utils::log_info(&output).expect("failed to log info");
             }
         }
@@ -118,7 +119,7 @@ impl Gee {
                     url: name.to_string(),
                 });
                 self.write_data().expect("recording git clone failed.");
-                utils::log_info("[ info ] cloning repository was successful")
+                utils::log_info("cloning repository was successful.")
                     .expect("logging info failed.");
             } else {
                 utils::log_process_error(process).expect("logging process error failed");

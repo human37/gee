@@ -1,6 +1,6 @@
 use std::{
     env::set_current_dir, fs::create_dir, fs::OpenOptions, io::Result, io::Write, path::Path,
-    process::Command, process::Stdio, env::var,
+    process::Command, process::Stdio, env::var, io::stdout,
 };
 
 const LOG_FILE: &'static str = ".gee/logs.txt";
@@ -67,6 +67,7 @@ pub fn show_logs() {
     };
     if process.status.success() {
         let output = String::from_utf8_lossy(&process.stdout);
+        stdout().flush().unwrap();
         print!("{}", output)
     } else {
         log_process_error(process).expect("logging error failed.")
