@@ -18,5 +18,8 @@ fn main() {
         sleep(Duration::from_secs(1));
         sp.stop();
     }
+    if let Some(_) = matches.subcommand_matches("list") {
+        g.print_status().expect("could not print repository info.");
+    }
     gee::utils::show_logs();
 }

@@ -89,7 +89,7 @@ impl Gee {
                     .expect("could not pop last repo off queue");
                 utils::remove_repo(&repo.url).expect("failed to remove repository");
                 let mut output: String = "just popped ".to_owned();
-                output.push_str(&repo.url);
+                output.push_str(&utils::prettify_url(&repo.url));
                 output.push_str(" off the queue.");
                 utils::log_info(&output).expect("failed to log info");
             }
@@ -124,6 +124,16 @@ impl Gee {
             } else {
                 utils::log_process_error(process).expect("logging process error failed");
             }
+        }
+        Ok(())
+    }
+
+    pub fn print_status(self) -> Result<()> {
+        let mut index = 1;
+        for repo in self.repositories {
+            let url = utils::prettify_url(&repo.url);
+            println!("{} | {}", index, url);
+            index += 1;
         }
         Ok(())
     }

@@ -7,15 +7,15 @@ const LOG_FILE: &'static str = ".gee/logs.txt";
 
 /// PARAMS: path = a path to the file.
 /// it will return true if the file exists,
-/// and false if the file does not exists.
+/// and false if the file does not exist.
 pub fn file_exists(path: &str) -> bool {
     let file = Path::new(path);
     file.is_file()
 }
 
-/// PARAMS: path = a path to the file.
-/// it will return true if the file exists,
-/// and false if the file does not exists.
+/// PARAMS: path = a path to the directory.
+/// it will return true if the dir exists,
+/// and false if the dir does not exist.
 pub fn dir_exists(path: &str) -> bool {
     let dir = Path::new(path);
     dir.is_dir()
@@ -121,4 +121,13 @@ pub fn init_file_system() -> Result<()> {
         remove_file(".gee/logs.txt")?;
     }
     Ok(())
+}
+
+/// PARAMS: the url of the repository.
+/// it will split the url based on the ':'
+/// character, on order to tidy up the output
+/// to the console.
+pub fn prettify_url(url: &str) -> &str {
+    let output: Vec<&str> = url.split(':').collect();
+    return output[1];
 }

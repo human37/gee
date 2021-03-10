@@ -9,3 +9,5 @@ subcommands:
         - url:
             help: the url of the repository
             required: true
+  - list:
+      about: prints all of the currently installed repositories 
