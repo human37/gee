@@ -1,9 +1,8 @@
 use std::{
-    env::set_current_dir, fs::create_dir, fs::OpenOptions, io::Result, io::Write, path::Path,
-    process::Command, process::Stdio, env::var, io::stdout,
+    env, fs, fs::OpenOptions, io::Result,
+    io::Write, path::Path, process::Command, process::Stdio,
 };
-
-const LOG_FILE: &'static str = ".gee/logs.txt";
+use home;
 
 /// PARAMS: path = a path to the file.
 /// it will return true if the file exists,
@@ -21,11 +20,32 @@ pub fn dir_exists(path: &str) -> bool {
     dir.is_dir()
 }
 
+pub fn return_curr_dir() -> String {
+    let process = match Command::new("pwd")
+        .stderr(Stdio::piped())
+        .stdout(Stdio::piped())
+        .output()
+    {
+        Err(why) => panic!("error executing process: {}", why),
+        Ok(process) => process,
+    };
+    let mut path = String::from_utf8_lossy(&process.stdout).to_string();
+    path.pop();
+    return path;
+}
+
+pub fn prefix_home(cmd: &str) -> String {
+    match home::home_dir() {
+        Some(path) => format!("{}/{}", path.display(), cmd),
+        None => { println!("impossible to get your home dir."); String::from("") },
+    }
+}
+
 /// PARAMS: process = a pointer to the process
 /// that had a non-zero exit status code.
 /// it writes the stderr to .gee/logs.txt, and then prints the log.
 pub fn log_process_error(process: std::process::Output) -> Result<()> {
-    match OpenOptions::new().create(true).append(true).open(LOG_FILE) {
+    match OpenOptions::new().create(true).append(true).open(prefix_home(".gee/logs.txt")) {
         Ok(ref mut file) => {
             let output = String::from_utf8_lossy(&process.stderr);
             writeln!(file, "{}", output).unwrap();
@@ -41,7 +61,7 @@ pub fn log_process_error(process: std::process::Output) -> Result<()> {
 /// liked logged. writes the output to the file
 /// at the path .gee/logs.txt.
 pub fn log_info(info: &str) -> Result<()> {
-    match OpenOptions::new().create(true).append(true).open(LOG_FILE) {
+    match OpenOptions::new().create(true).append(true).open(prefix_home(".gee/logs.txt")) {
         Ok(ref mut file) => {
             writeln!(file, "{}", info).unwrap();
         }
@@ -67,7 +87,6 @@ pub fn show_logs() {
     };
     if process.status.success() {
         let output = String::from_utf8_lossy(&process.stdout);
-        stdout().flush().unwrap();
         print!("{}", output)
     } else {
         log_process_error(process).expect("logging error failed.")
@@ -103,22 +122,15 @@ pub fn remove_file(path: &str) -> Result<()> {
 }
 
 /// PARAMS: none.
-/// sets the working directory to the user's home directory.
-pub fn set_home_dir() {
-    let home_env = var("HOME").expect("could not fetch the user's HOME env variable.");
-    let root = Path::new(&home_env);
-    assert!(set_current_dir(&root).is_ok());
-}
-
-/// PARAMS: none.
 /// if the necessary filesystem is not in place,
-/// create the necessary files / directories. 
+/// create the necessary files / directories.
 pub fn init_file_system() -> Result<()> {
-    if !dir_exists(".gee") {
-        create_dir(".gee")?;
+    println!("{}", env::current_dir()?.display());
+    if !dir_exists(&prefix_home(".gee")) {
+        fs::create_dir(&prefix_home(".gee"))?;
     }
-    if file_exists(".gee/logs.txt") {
-        remove_file(".gee/logs.txt")?;
+    if file_exists(&prefix_home(".gee/logs.txt")) {
+        remove_file(&prefix_home(".gee/logs.txt"))?;
     }
     Ok(())
 }
@@ -128,6 +140,7 @@ pub fn init_file_system() -> Result<()> {
 /// character, on order to tidy up the output
 /// to the console.
 pub fn prettify_url(url: &str) -> &str {
-    let output: Vec<&str> = url.split(':').collect();
-    return output[1];
+    let slashes: Vec<&str> = url.split('/').collect();
+    let dots: Vec<&str> = slashes[slashes.len() -1].split('.').collect();
+    return dots[0];
 }

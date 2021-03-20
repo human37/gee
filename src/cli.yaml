@@ -11,3 +11,11 @@ subcommands:
             required: true
   - list:
       about: prints all of the currently installed repositories 
+  - open:
+      about: opens the repository at the desired index 
+      args:
+        - index:
+            help: the index of the repository in the queue
+            required: true
+  - done:
+      about: closes the currently opened repository 

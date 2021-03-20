@@ -1,2 +1,2 @@
 run:
-	cargo run
+	cargo install --path .
