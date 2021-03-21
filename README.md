@@ -1,8 +1,31 @@
 # gee
-Repository manager and automation tool written in rust.
+CLI repository manager and automation tool written in rust.
 
-### Problem
-The problem I have is managing where I clone repositories I find on github. I hate having to remember the directory I cloned something, especially when I am done checking it out and I have to remember to delete it from its specific directory also. I also like checking out lots of git repositories, and managing storage on my computer can become an issue after some time.
+### Overview
+If you like temporarily cloning repositories, then Gee is the tool for you! It allows you to clone any repository on github by running:
 
-### Solution
-My solution is my package manager called “gee”. It will allow you to clone any git repository by saying “gee install {url}”. It will then install it into a globally accessible directory, and it will allow me to access them from any directory by saying “gee open {name}”. I will also be able to run “gee list” and it will show me all of my current installed git repositories. It will also solve my storage issue by having a queue, where it will only store my 5 most recent git repository clones, by automatically deleting the oldest one when I download a new one. I can also change this number from 5 to any arbitrary number I would like. I also would like to make commands such as “gee update”, and it will run a git pull command in all of my git repositories. Depending on how long these features take me, I will also look into adding more advanced features, such as searching for a Makefile and building automatically, etc.
+    $ gee clone <url>
+
+Gee will then download the repository into ```~/.gee/tmp/```. Gee clones them into this directory, in order to implement a temporary repository queue. It allows the user to have a configurable maximum number of repositories they would like Gee to store. And when the user clones enough repositories on the queue to go over that limit, Gee will automatically remove the oldest repository in order to pop it off of the queue. You can run the command:
+
+    $ gee list
+
+in order to see all of your repositories you have currently installed using gee, as well as it's index in the repository queue. In order to open a repository you have cloned with gee, you can run the command:
+
+    $ gee open <index>
+
+Gee will then create a symbolic link of the desired repository in your current working directory. When you decide you are done using that repository, you can run the command:
+
+    $ gee done
+
+in order to remove the symbolic link, and close the opened repository. You can also run the command:
+
+    $ gee help
+
+in order to recieve more information about the functionality of Gee. 
+
+### Configuration
+By default, Gee will assume the maximum number of repositories to store as 5. You can configure this by adding a ```.geerc``` file in your home directory. And for example, if you would like to change the maximum number to 9, add this line in your ```.geerc``` file:
+```
+queue_size 9
+```
