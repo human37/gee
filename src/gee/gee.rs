@@ -127,19 +127,47 @@ impl Gee {
         Ok(())
     }
 
+    /// PARAMS: index = the index of the repository.
+    /// creates a symlink of the desired repository in
+    /// the user's current directory. Also records the
+    /// path of the link in the self.open_link datamember.
     pub fn open_repo(&mut self, index: usize) -> Result<()> {
-        let path = utils::prefix_home(".gee/tmp/").to_owned()
-            + utils::prettify_url(&self.repositories[index - 1].url);
-        let link = String::from("./") + utils::prettify_url(&self.repositories[index - 1].url);
-        self.open_link = String::from(utils::return_curr_dir())
-            + "/" + utils::prettify_url(&self.repositories[index - 1].url);
-        self.write_data()?;
-        unix::fs::symlink(path, link)
+        if self.open_link == "" {
+            let path = utils::prefix_home(".gee/tmp/").to_owned()
+                + utils::prettify_url(&self.repositories[index - 1].url);
+            let link = String::from("./") + utils::prettify_url(&self.repositories[index - 1].url);
+            self.open_link = String::from(utils::return_curr_dir())
+                + "/"
+                + utils::prettify_url(&self.repositories[index - 1].url);
+            if !utils::dir_exists(&link) {
+                self.write_data()?;
+                unix::fs::symlink(path, link)?;
+                println!(
+                    "successfully opened {} in your current directory.",
+                    utils::prettify_url(&self.repositories[index - 1].url)
+                );
+            } else {
+                println!("this repository is already open, type 'gee done' to close.");
+            }
+        } else {
+            println!("you already have a repository open, type 'gee done' to close.");
+        }
+        Ok(())
     }
 
+    /// PARAMS: none. closes the currently opened
+    /// repository, by running an 'rm' command on the
+    /// symbolic link. If no repository is opened,
+    /// it prints a message and returns.
     pub fn close_repo(&mut self) -> Result<()> {
-        utils::remove_file(&self.open_link)?;
-        self.open_link = "".to_string();
+        if utils::dir_exists(&self.open_link) {
+            utils::remove_file(&self.open_link)?;
+            self.open_link = "".to_string();
+            self.write_data()?;
+            println!("successfully closed the opened repository.")
+        } else {
+            println!("there is no repository currently open.");
+        }
         Ok(())
     }
 
@@ -149,9 +177,12 @@ impl Gee {
     /// index value.
     pub fn print_status(self) -> Result<()> {
         let mut index = 1;
+        println!("==================");
+        println!("index   repository");
+        println!("==================");
         for repo in self.repositories {
             let url = utils::prettify_url(&repo.url);
-            println!("{} | {}", index, url);
+            println!("[ {} ]   {} ", index, url);
             index += 1;
         }
         Ok(())

@@ -3,12 +3,12 @@ use std::collections::VecDeque;
 pub mod gee;
 pub mod utils;
 
-#[derive(Clone, Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize)]
 struct Config {
     queue_size: usize,
 }
 
-#[derive(Clone, Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize)]
 struct Repo {
     url: String,
 }
@@ -19,7 +19,7 @@ impl PartialEq for Repo {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Gee {
     config: Config,
     repositories: VecDeque<Repo>,

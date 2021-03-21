@@ -4,18 +4,18 @@ author: Ammon Taylor <ammonx9@gmail.com>
 about: CLI repository manager and automation tool written in rust.
 subcommands:
   - clone:
-      about: clones a repository and pushes it on the queue
+      about: Clones a repository and pushes it on the queue
       args:
         - url:
-            help: the url of the repository
+            help: The url of the repository
             required: true
   - list:
-      about: prints all of the currently installed repositories 
+      about: Prints all of the currently installed repositories 
   - open:
-      about: opens the repository at the desired index 
+      about: Opens the repository at the desired index 
       args:
         - index:
-            help: the index of the repository in the queue
+            help: The index of the repository in the queue
             required: true
   - done:
-      about: closes the currently opened repository 
+      about: Closes the currently opened repository 

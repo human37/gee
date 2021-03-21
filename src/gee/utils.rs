@@ -1,8 +1,8 @@
+use home::home_dir;
 use std::{
-    env, fs, fs::OpenOptions, io::Result,
-    io::Write, path::Path, process::Command, process::Stdio,
+    fs::create_dir, fs::OpenOptions, io::Result, io::Write, path::Path, process::Command,
+    process::Stdio,
 };
-use home;
 
 /// PARAMS: path = a path to the file.
 /// it will return true if the file exists,
@@ -35,9 +35,12 @@ pub fn return_curr_dir() -> String {
 }
 
 pub fn prefix_home(cmd: &str) -> String {
-    match home::home_dir() {
+    match home_dir() {
         Some(path) => format!("{}/{}", path.display(), cmd),
-        None => { println!("impossible to get your home dir."); String::from("") },
+        None => {
+            println!("impossible to get your home dir.");
+            String::from("")
+        }
     }
 }
 
@@ -45,10 +48,14 @@ pub fn prefix_home(cmd: &str) -> String {
 /// that had a non-zero exit status code.
 /// it writes the stderr to .gee/logs.txt, and then prints the log.
 pub fn log_process_error(process: std::process::Output) -> Result<()> {
-    match OpenOptions::new().create(true).append(true).open(prefix_home(".gee/logs.txt")) {
+    match OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(prefix_home(".gee/logs.txt"))
+    {
         Ok(ref mut file) => {
             let output = String::from_utf8_lossy(&process.stderr);
-            writeln!(file, "{}", output).unwrap();
+            writeln!(file, "{}", output)?;
         }
         Err(err) => {
             panic!("failed to open log file: {}", err);
@@ -61,7 +68,11 @@ pub fn log_process_error(process: std::process::Output) -> Result<()> {
 /// liked logged. writes the output to the file
 /// at the path .gee/logs.txt.
 pub fn log_info(info: &str) -> Result<()> {
-    match OpenOptions::new().create(true).append(true).open(prefix_home(".gee/logs.txt")) {
+    match OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(prefix_home(".gee/logs.txt"))
+    {
         Ok(ref mut file) => {
             writeln!(file, "{}", info).unwrap();
         }
@@ -125,9 +136,8 @@ pub fn remove_file(path: &str) -> Result<()> {
 /// if the necessary filesystem is not in place,
 /// create the necessary files / directories.
 pub fn init_file_system() -> Result<()> {
-    println!("{}", env::current_dir()?.display());
     if !dir_exists(&prefix_home(".gee")) {
-        fs::create_dir(&prefix_home(".gee"))?;
+        create_dir(&prefix_home(".gee"))?;
     }
     if file_exists(&prefix_home(".gee/logs.txt")) {
         remove_file(&prefix_home(".gee/logs.txt"))?;
@@ -141,6 +151,6 @@ pub fn init_file_system() -> Result<()> {
 /// to the console.
 pub fn prettify_url(url: &str) -> &str {
     let slashes: Vec<&str> = url.split('/').collect();
-    let dots: Vec<&str> = slashes[slashes.len() -1].split('.').collect();
+    let dots: Vec<&str> = slashes[slashes.len() - 1].split('.').collect();
     return dots[0];
 }
