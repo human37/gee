@@ -10,12 +10,21 @@ subcommands:
             help: The url of the repository
             required: true
   - list:
-      about: Prints all of the currently installed repositories 
+      about: Prints all of the currently installed repositories
   - open:
-      about: Opens the repository at the desired index 
+      about: Opens the repository at the desired index
       args:
         - index:
             help: The index of the repository in the queue
             required: true
   - done:
-      about: Closes the currently opened repository 
+      about: Closes the currently opened repository
+  - keep:
+      about: Copies the desired repository out of the queue at the desired path
+      args:
+        - index:
+            help: the index of the repository in the queue
+            required: true
+        - path:
+            help: the path relative to your current working directory
+            required: false

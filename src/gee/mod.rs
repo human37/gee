@@ -9,8 +9,8 @@ struct Config {
 }
 
 #[derive(Clone, Deserialize, Serialize)]
-struct Repo {
-    url: String,
+pub struct Repo {
+    pub url: String,
 }
 
 impl PartialEq for Repo {
@@ -22,7 +22,7 @@ impl PartialEq for Repo {
 #[derive(Clone, Deserialize, Serialize)]
 pub struct Gee {
     config: Config,
-    repositories: VecDeque<Repo>,
+    pub repositories: VecDeque<Repo>,
     current_dir: String,
     open_link: String,
 }

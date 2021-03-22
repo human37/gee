@@ -43,5 +43,20 @@ fn main() {
         g.parse_conf();
         g.close_repo().expect("could not close repository.");
     }
+    // "keep" subcommand
+    if let Some(args) = matches.subcommand_matches("keep") {
+        let mut g = gee::Gee::new();
+        g.parse_conf();
+        match args.value_of("index").unwrap().parse::<usize>() {
+            Ok(value) => {
+                let repo = &g.repositories[value - 1].url;
+                let path = args.value_of("path").unwrap_or(".");
+                gee::utils::copy_repo(&repo, path).expect("could not copy the repository.");
+            }
+            Err(_) => {
+                println!("could not parse the index, use 'gee list' to find the index of the repository you would like to open.")
+            }
+        };
+    }
     gee::utils::show_logs();
 }

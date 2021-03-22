@@ -154,3 +154,20 @@ pub fn prettify_url(url: &str) -> &str {
     let dots: Vec<&str> = slashes[slashes.len() - 1].split('.').collect();
     return dots[0];
 }
+
+pub fn copy_repo(url: &str, path: &str) -> Result<()> {
+    let full_path = String::new() + ".gee/tmp/" + prettify_url(url);
+    let process = match Command::new("cp")
+        .args(&["-r", &prefix_home(&full_path), &path])
+        .stderr(Stdio::piped())
+        .stdout(Stdio::piped())
+        .output()
+    {
+        Err(why) => panic!("error executing process: {}", why),
+        Ok(process) => process,
+    };
+    if !process.status.success() {
+        log_process_error(process).expect("logging error failed.");
+    }
+    Ok(())
+}
