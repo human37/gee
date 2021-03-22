@@ -88,7 +88,7 @@ pub fn log_info(info: &str) -> Result<()> {
 /// prints the output of .gee/log.txt
 pub fn show_logs() {
     let process = match Command::new("cat")
-        .arg(".gee/logs.txt")
+        .arg(prefix_home(".gee/logs.txt"))
         .stderr(Stdio::piped())
         .stdout(Stdio::piped())
         .output()
@@ -109,7 +109,7 @@ pub fn show_logs() {
 /// with the parameters's name.
 pub fn remove_repo(name: &str) -> Result<()> {
     let path = String::new() + ".gee/tmp/" + &name.to_string();
-    remove_file(&path)?;
+    remove_file(&prefix_home(&path))?;
     Ok(())
 }
 

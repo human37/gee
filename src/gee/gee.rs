@@ -71,22 +71,14 @@ impl Gee {
     /// parses the user's configurations, and checks to see if this
     /// repository has already been cloned, and also if the total number
     /// of cloned repositories is greater then the user's configured number.
-    fn manage_repo_installations(&mut self, name: &str) -> bool {
+    fn manage_repo_installations(&mut self) -> bool {
         if utils::file_exists(&utils::prefix_home(".gee/metadata.json")) {
-            let repo = Repo {
-                url: name.to_string(),
-            };
-            if self.repositories.contains(&repo) {
-                utils::log_info("this repository is already on the queue.")
-                    .expect("failed to log info");
-                return false;
-            }
-            while self.repositories.len() >= self.config.queue_size.try_into().unwrap() {
+            while self.repositories.len() > self.config.queue_size.try_into().unwrap() {
                 let repo = self
                     .repositories
                     .pop_back()
                     .expect("could not pop last repo off queue");
-                utils::remove_repo(&repo.url).expect("failed to remove repository");
+                utils::remove_repo(utils::prettify_url(&repo.url)).expect("failed to remove repository");
                 let mut output: String = "just popped ".to_owned();
                 output.push_str(&utils::prettify_url(&repo.url));
                 output.push_str(" off the queue.");
@@ -96,12 +88,26 @@ impl Gee {
         return true;
     }
 
+    fn repo_on_queue(&mut self, name: &str) -> bool {
+        if utils::file_exists(&utils::prefix_home(".gee/metadata.json")) {
+            let repo = Repo {
+                url: name.to_string(),
+            };
+            if self.repositories.contains(&repo) {
+                utils::log_info("this repository is already on the queue.")
+                    .expect("failed to log info");
+                return true;
+            }
+        }
+        return false;
+    }
+
     /// PARAMS: name = the url to the repository.
     /// runs a 'git clone' command.
     /// clones the repo into .gee/tmp/, and
     /// it also logs the output to .gee/log.txt
     pub fn clone_repo(&mut self, name: &str) -> Result<()> {
-        if self.manage_repo_installations(name) {
+        if !self.repo_on_queue(name) {
             let mut dir = utils::prefix_home(".gee/tmp/");
             dir.push_str(utils::prettify_url(name));
             let process = match Command::new("git")
@@ -114,12 +120,14 @@ impl Gee {
                 Ok(process) => process,
             };
             if process.status.success() {
-                self.repositories.push_front(Repo {
-                    url: name.to_string(),
-                });
-                self.write_data().expect("recording git clone failed.");
-                utils::log_info("cloning repository was successful.")
-                    .expect("logging info failed.");
+                if self.manage_repo_installations() {
+                    self.repositories.push_front(Repo {
+                        url: name.to_string(),
+                    });
+                    self.write_data().expect("recording git clone failed.");
+                    utils::log_info("cloning repository was successful.")
+                        .expect("logging info failed.");
+                }
             } else {
                 utils::log_process_error(process).expect("logging process error failed");
             }
