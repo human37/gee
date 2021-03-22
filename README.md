@@ -33,3 +33,13 @@ By default, Gee will assume the maximum number of repositories to store as 5. Yo
 ```
 queue_size 9
 ```
+
+### Installation
+This is available for you macintosh user's as a homebrew tap. In order to install run:
+
+    $ brew tap human37/gee
+      brew install gee
+
+You can also complile from source and install using cargo, using the command:
+
+    $ cargo install --path .
