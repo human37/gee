@@ -28,8 +28,14 @@ fn main() {
     if let Some(index) = matches.subcommand_matches("open") {
         let mut g = gee::Gee::new();
         g.parse_conf();
-        g.open_repo(index.value_of("index").unwrap().parse::<usize>().unwrap())
-            .expect("could not open repository.");
+        match index.value_of("index").unwrap().parse::<usize>() {
+            Ok(value) => {
+                g.open_repo(value).expect("could not open repository.");
+            }
+            Err(_) => {
+                println!("could not parse the index, use 'gee list' to find the index of the repository you would like to open.")
+            }
+        };
     }
     // "done" subcommand
     if let Some(_) = matches.subcommand_matches("done") {
