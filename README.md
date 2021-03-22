@@ -20,6 +20,10 @@ Gee will then create a symbolic link of the desired repository in your current w
 
 in order to remove the symbolic link, and close the opened repository. You can also run the command:
 
+    $ gee keep <index> [path]
+
+in order to copy a repository out of Gee's queue, if you decide you would like to keep it. If you don't specify the path parameter, it will assume the user's currently working directory. You can also run the command:
+
     $ gee help
 
 in order to recieve more information about the functionality of Gee. 
