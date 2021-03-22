@@ -35,11 +35,11 @@ queue_size 9
 ```
 
 ### Installation
-This is available for you macintosh user's as a homebrew tap. In order to install run:
+This is available for you macintosh user's as a [homebrew](https://brew.sh) tap. In order to install run:
 
     $ brew tap human37/gee
       brew install gee
 
-You can also complile from source and install using cargo, using the command:
+You can also complile from source and install using cargo. First clone the repository, and then within the repository run:
 
     $ cargo install --path .
