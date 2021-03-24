@@ -10,7 +10,7 @@ Gee will then download the repository into ```~/.gee/tmp/```. Gee clones them in
 
     $ gee mass <organization> [identifier]
     
-With the organization being the name of the github organization, and the identifier being any string. The identifier is optional, but if you include it, Gee will only clone the repositories within the organization that match that identifier. In order to use this functionality, you will need the ```github_token``` key set in your ```.geerc``` file. See the prerequisites section for more information. You can also run the command:
+With the organization being the name of the github organization, and the identifier being any string. The identifier is optional, but if you include it, Gee will only clone the repositories within the organization that match that identifier. In order to use this functionality, you will need the ```github_token``` key set in your ```.geerc``` file. See the [prerequisites](https://github.com/human37/gee/blob/develop/README.md#prerequisites) section for more information. You can also run the command:
 
     $ gee list
 
