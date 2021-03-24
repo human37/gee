@@ -30,7 +30,7 @@ in order to copy a repository out of Gee's queue, if you decide you would like t
 
     $ gee help
 
-in order to recieve more information about the functionality of Gee. 
+in order to receive more information about the functionality of Gee. 
 
 ### Configuration
 By default, Gee will assume the maximum number of repositories to store as 5. You can configure this by adding a ```.geerc``` file in your home directory. And for example, if you would like to change the maximum number to 9, add this line in your ```.geerc``` file:
@@ -39,7 +39,8 @@ queue_size 9
 ```
 
 ### Prerequisites
-You will need to use [ssh key authentication](https://docs.github.com/en/github-ae@latest/github/authenticating-to-github/connecting-to-github-with-ssh) with github in order for Gee to work. If you would like to run ```gee mass```, you will also need a [personal access token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) (with at least read-only access to your organization's repositories) in your ```.geerc``` file. Like so:
+* You will need to use [ssh key authentication](https://docs.github.com/en/github-ae@latest/github/authenticating-to-github/connecting-to-github-with-ssh) with github in order for Gee to work. 
+* If you would like to run ```gee mass```, you will also need a [personal access token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) (with at least read-only access to your organization's repositories) in your ```.geerc``` file. Like so:
 ```
 github_token <key goes here>
 ```
@@ -50,6 +51,6 @@ This is available for you macintosh user's as a [homebrew](https://brew.sh) tap.
     $ brew tap human37/gee
       brew install gee
 
-You can also complile from source and install using cargo. First clone the repository, and then within the repository run:
+You can also compile from source and install using cargo. First clone the repository, and then within the repository run:
 
     $ cargo install --path .
