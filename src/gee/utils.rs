@@ -173,14 +173,14 @@ pub fn copy_repo(url: &str, path: &str) -> Result<()> {
 }
 
 /// PARAMS: vector = a vector of strings,
-/// identifier = an identifier string.
+/// wildcard = a wildcard string.
 /// this function will output a new
 /// vector of all of items that contain the
-/// identifier.
-pub fn contains_substring(vector: Vec<String>, identifier: String) -> Vec<String> {
+/// wildcard.
+pub fn contains_substring(vector: Vec<String>, wildcard: String) -> Vec<String> {
     let mut contains_sub_vec = vec![];
     for item in vector {
-        if item.contains(&identifier) {
+        if item.contains(&wildcard) {
             contains_sub_vec.push(item);
         }
     }

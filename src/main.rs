@@ -65,20 +65,21 @@ fn main() {
                 let mut g = gee::Gee::new();
                 g.parse_conf();
                 if g.config.github_token == "" {
+                    println!("you do not have a github personal access token in your '.geerc' file.");
                     return;
                 }
-                let identifier = args.value_of("identifier").unwrap_or("");
+                let wildcard = args.value_of("wildcard").unwrap_or("");
                 let repositories =
                     gee::api::get_repos(&org, &g.config.github_token);
                 let repos_contain =
-                    gee::utils::contains_substring(repositories, identifier.to_string());
+                    gee::utils::contains_substring(repositories, wildcard.to_string());
                 let num_repos = repos_contain.len();
-                let full_org_name = String::from(&org) + " [id: '" + identifier + "']";
+                let full_org_name = String::from(&org) + " [wildcard: '" + wildcard + "']";
                 if !g.repo_on_queue(&full_org_name) {
-                    if identifier != "" {
+                    if wildcard != "" {
                         println!(
-                            "found {} repositories within {} that match the identifier '{}'",
-                            num_repos, org, identifier
+                            "found {} repositories within {} that match the wildcard '{}'",
+                            num_repos, org, wildcard
                         );
                     } else {
                         println!("found {} repositories within {}", num_repos, org);
@@ -99,6 +100,7 @@ fn main() {
                             num_cloned += 1;
                         }
                         sp.stop();
+                        println!("");
                     }
                 }
             }

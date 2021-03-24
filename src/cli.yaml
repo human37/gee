@@ -1,5 +1,5 @@
 name: gee
-version: "1.0"
+version: "1.1"
 author: Ammon Taylor <ammonx9@gmail.com>
 about: CLI repository manager and automation tool written in rust.
 subcommands:
@@ -34,6 +34,6 @@ subcommands:
         - organization:
             help: the organization name
             required: true
-        - identifier:
-            help: the identifier the repository name must match in order to be cloned
+        - wildcard:
+            help: the wildcard string the repository name must include in order to be cloned
             required: false

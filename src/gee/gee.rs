@@ -39,6 +39,8 @@ impl Gee {
         if utils::file_exists(&utils::prefix_home(".geerc")) {
             let file = File::open(utils::prefix_home(".geerc")).unwrap();
             let reader = BufReader::new(file);
+            let mut token_found = false;
+            let mut queue_size_found = false;
             for line in reader.lines() {
                 let line = line.unwrap();
                 let mut split_line = line.split_whitespace();
@@ -50,18 +52,26 @@ impl Gee {
                         .parse()
                         .expect("failed to convert &str value to i32");
                     self.config.queue_size = value;
+                    queue_size_found = true;
                 } else if key == "github_token" {
                     let value: String = value
                         .trim()
                         .parse()
                         .expect("failed to convert &str to String");
                     self.config.github_token = value;
+                    token_found = true;
                 } else {
                     let mut output = "unknown key: ".to_owned();
                     output.push_str(key);
-                    output.push_str(" found in file .geerc, now using default configurations.");
+                    output.push_str(" found in file '.geerc', now using default configurations.");
                     println!("{}", output);
                 }
+            }
+            if !token_found {
+                self.config.github_token = "".to_string();
+            }
+            if !queue_size_found {
+                self.config.queue_size = 5;
             }
         }
     }
