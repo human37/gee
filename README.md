@@ -39,7 +39,7 @@ queue_size 9
 ```
 
 ### Prerequisites
-You will need to use [ssh key authentication](https://docs.github.com/en/github-ae@latest/github/authenticating-to-github/connecting-to-github-with-ssh) with github in order for gee to work. If you would like to run ```gee mass```, you will also need a [personal access token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) (with at least read-only access to your organization's repositories) in your ```.geerc``` file. Like so:
+You will need to use [ssh key authentication](https://docs.github.com/en/github-ae@latest/github/authenticating-to-github/connecting-to-github-with-ssh) with github in order for Gee to work. If you would like to run ```gee mass```, you will also need a [personal access token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) (with at least read-only access to your organization's repositories) in your ```.geerc``` file. Like so:
 ```
 github_token <key goes here>
 ```
