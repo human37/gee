@@ -1,4 +1,4 @@
-use super::{utils, Config, Gee, Repo};
+use super::{utils, Config, Gee, Organization, Repo};
 use std::{
     collections::VecDeque, convert::TryInto, fs::File, io::prelude::*, io::BufRead, io::BufReader,
     io::Result, os::unix, process::Command, process::Stdio,
@@ -20,7 +20,10 @@ impl Gee {
         } else {
             Gee {
                 repositories: VecDeque::new(),
-                config: Config { queue_size: 5 },
+                config: Config {
+                    queue_size: 5,
+                    github_token: "".to_string(),
+                },
                 current_dir: "".to_string(),
                 open_link: "".to_string(),
             }
@@ -47,6 +50,12 @@ impl Gee {
                         .parse()
                         .expect("failed to convert &str value to i32");
                     self.config.queue_size = value;
+                } else if key == "github_token" {
+                    let value: String = value
+                        .trim()
+                        .parse()
+                        .expect("failed to convert &str to String");
+                    self.config.github_token = value;
                 } else {
                     let mut output = "unknown key: ".to_owned();
                     output.push_str(key);
@@ -78,7 +87,8 @@ impl Gee {
                     .repositories
                     .pop_back()
                     .expect("could not pop last repo off queue");
-                utils::remove_repo(utils::prettify_url(&repo.url)).expect("failed to remove repository");
+                utils::remove_repo(utils::prettify_url(&repo.url))
+                    .expect("failed to remove repository");
                 let mut output: String = "just popped ".to_owned();
                 output.push_str(&utils::prettify_url(&repo.url));
                 output.push_str(" off the queue.");
@@ -88,10 +98,15 @@ impl Gee {
         return true;
     }
 
-    fn repo_on_queue(&mut self, name: &str) -> bool {
+    pub fn repo_on_queue(&mut self, name: &str) -> bool {
         if utils::file_exists(&utils::prefix_home(".gee/metadata.json")) {
             let repo = Repo {
                 url: name.to_string(),
+                is_mass: false,
+                org: Organization {
+                    name: "".to_string(),
+                    repositories: vec![],
+                },
             };
             if self.repositories.contains(&repo) {
                 utils::log_info("this repository is already on the queue.")
@@ -123,6 +138,11 @@ impl Gee {
                 if self.manage_repo_installations() {
                     self.repositories.push_front(Repo {
                         url: name.to_string(),
+                        is_mass: false,
+                        org: Organization {
+                            name: "".to_string(),
+                            repositories: vec![],
+                        },
                     });
                     self.write_data().expect("recording git clone failed.");
                     utils::log_info("cloning repository was successful.")
@@ -131,6 +151,52 @@ impl Gee {
             } else {
                 utils::log_process_error(process).expect("logging process error failed");
             }
+        }
+        Ok(())
+    }
+
+    /// PARAMS: name = the url to the repository,
+    /// org = the name of the organization.
+    /// runs a 'git clone' command.
+    /// clones the repo into .gee/tmp/org/, and
+    /// it also logs the output to .gee/log.txt
+    pub fn clone_repo_within_org(&mut self, name: &str, org: &str) -> Result<()> {
+        let mut dir = utils::prefix_home(".gee/tmp/");
+        dir.push_str(org);
+        dir.push_str("/");
+        dir.push_str(utils::prettify_url(name));
+        let process = match Command::new("git")
+            .args(&["clone", "--progress", name, &dir])
+            .stderr(Stdio::piped())
+            .stdout(Stdio::piped())
+            .output()
+        {
+            Err(why) => panic!("error executing process: {}", why),
+            Ok(process) => process,
+        };
+        if process.status.success() {
+            let organization = Repo {
+                url: org.to_string(),
+                is_mass: true,
+                org: Organization {
+                    name: org.to_string(),
+                    repositories: vec![],
+                },
+            };
+            let index = self.repositories.iter().position(|x| x == &organization);
+            if index == None {
+                if self.manage_repo_installations() {
+                    self.repositories.push_back(organization);
+                }
+            } else {
+                self.repositories[index.unwrap()]
+                    .org
+                    .repositories
+                    .push(organization);
+            }
+            self.write_data().expect("recording git clone failed.");
+        } else {
+            utils::log_process_error(process).expect("logging process error failed");
         }
         Ok(())
     }
@@ -185,13 +251,17 @@ impl Gee {
     /// index value.
     pub fn print_status(self) -> Result<()> {
         let mut index = 1;
-        println!("==================");
-        println!("index   repository");
-        println!("==================");
-        for repo in self.repositories {
-            let url = utils::prettify_url(&repo.url);
-            println!("[ {} ]   {} ", index, url);
-            index += 1;
+        if self.repositories.len() != 0 {
+            println!("==================");
+            println!("index   repository");
+            println!("==================");
+            for repo in self.repositories {
+                let url = utils::prettify_url(&repo.url);
+                println!("[ {} ]   {} ", index, url);
+                index += 1;
+            }
+        } else {
+            println!("you do not have any repositories currently installed with gee.")
         }
         Ok(())
     }

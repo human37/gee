@@ -58,5 +58,54 @@ fn main() {
             }
         };
     }
+    // "mass" subcommand
+    if let Some(args) = matches.subcommand_matches("mass") {
+        match args.value_of("organization").unwrap().parse::<String>() {
+            Ok(org) => {
+                let mut g = gee::Gee::new();
+                g.parse_conf();
+                if g.config.github_token == "" {
+                    return;
+                }
+                let identifier = args.value_of("identifier").unwrap_or("");
+                let repositories =
+                    gee::api::get_repos(&org, &g.config.github_token);
+                let repos_contain =
+                    gee::utils::contains_substring(repositories, identifier.to_string());
+                let num_repos = repos_contain.len();
+                let full_org_name = String::from(&org) + " [id: '" + identifier + "']";
+                if !g.repo_on_queue(&full_org_name) {
+                    if identifier != "" {
+                        println!(
+                            "found {} repositories within {} that match the identifier '{}'",
+                            num_repos, org, identifier
+                        );
+                    } else {
+                        println!("found {} repositories within {}", num_repos, org);
+                    }
+                    if num_repos > 0 {
+                        let mut num_cloned = 1;
+                        let sp = Spinner::new(Spinners::Dots9, "cloning...".into());
+                        for repo in repos_contain {
+                            let status = String::new()
+                                + "cloning... ("
+                                + &num_cloned.to_string()
+                                + "/"
+                                + &num_repos.to_string()
+                                + ")";
+                            sp.message(status);
+                            g.clone_repo_within_org(&repo, &full_org_name)
+                                .expect("could not clone repository");
+                            num_cloned += 1;
+                        }
+                        sp.stop();
+                    }
+                }
+            }
+            Err(_) => {
+                println!("could not parse the organization arguments correctly.");
+            }
+        };
+    }
     gee::utils::show_logs();
 }

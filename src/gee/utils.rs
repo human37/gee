@@ -171,3 +171,18 @@ pub fn copy_repo(url: &str, path: &str) -> Result<()> {
     }
     Ok(())
 }
+
+/// PARAMS: vector = a vector of strings,
+/// identifier = an identifier string.
+/// this function will output a new
+/// vector of all of items that contain the
+/// identifier.
+pub fn contains_substring(vector: Vec<String>, identifier: String) -> Vec<String> {
+    let mut contains_sub_vec = vec![];
+    for item in vector {
+        if item.contains(&identifier) {
+            contains_sub_vec.push(item);
+        }
+    }
+    return contains_sub_vec;
+}
