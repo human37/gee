@@ -10,7 +10,7 @@ Gee will then download the repository into ```~/.gee/tmp/```. Gee clones them in
 
     $ gee mass <organization> [identifier]
     
-With the organization being the name of the github organization, and the identifier being any string. The identifier is optional, but if you include it, Gee will only clone the repositories within the organization that match that identifier. In order to use this functionality, you will need the ```github_token``` key set in your ```.geerc``` file. See the prerequisite section for more information. You can also run the command:
+With the organization being the name of the github organization, and the identifier being any string. The identifier is optional, but if you include it, Gee will only clone the repositories within the organization that match that identifier. In order to use this functionality, you will need the ```github_token``` key set in your ```.geerc``` file. See the prerequisites section for more information. You can also run the command:
 
     $ gee list
 
@@ -38,7 +38,7 @@ By default, Gee will assume the maximum number of repositories to store as 5. Yo
 queue_size 9
 ```
 
-### Prerequisite
+### Prerequisites
 You will need to use [ssh key authentication](https://docs.github.com/en/github-ae@latest/github/authenticating-to-github/connecting-to-github-with-ssh) with github in order for gee to work. If you would like to run ```gee mass```, you will also need a [personal access token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) (with at least read-only access to your organization's repositories) in your ```.geerc``` file. Like so:
 ```
 github_token <key goes here>
