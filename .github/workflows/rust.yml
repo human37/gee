@@ -1,4 +1,4 @@
-name: build and tests
+name: Build
 
 on:
   push:
@@ -16,14 +16,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: build
+    - name: Build
       run: cargo install --verbose --path .
-    - name: set up unit test environment
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.6
-    - name: run unit tests with cargo
+    - name: Tests
       run: cargo test --verbose
-    - name: run unit tests with python
-      run: python tests/unit_tests.py
-    
