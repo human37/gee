@@ -20,6 +20,9 @@ pub fn dir_exists(path: &str) -> bool {
     dir.is_dir()
 }
 
+/// PARAMS: none. this function will
+/// return the user's current working directory
+/// without the '\n' character at the end. 
 pub fn return_curr_dir() -> String {
     let process = match Command::new("pwd")
         .stderr(Stdio::piped())
