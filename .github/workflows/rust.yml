@@ -1,4 +1,4 @@
-name: Rust Build
+name: build and tests
 
 on:
   push:
@@ -16,7 +16,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
+    - name: build
+      run: cargo install --verbose --path .
+    - name: set up unit test environment
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.6
+    - name: run unit tests with cargo
       run: cargo test --verbose
+    - name: run unit tests with python
+      run: python tests/unit_tests.py
+    
