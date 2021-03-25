@@ -8,9 +8,10 @@ class Full(unittest.TestCase):
         return subprocess.Popen(args, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
 
     def setUp(self):
+        print(self.run_command('pwd'))
         self.run_command(['rm', '-rf', '/Users/ammont/.gee'])
 
-    def test_gee_list(self):
+    def test_1_gee_list(self):
         self.setUp()
         out = self.run_command(['gee', 'list'])
         self.assertIn(
@@ -26,11 +27,11 @@ class Full(unittest.TestCase):
             'gee list with one repository installed returned an invalid response.'
         )
 
-    def test_gee_clone(self):
+    def test_2_gee_clone(self):
         self.setUp()
         out = self.run_command(['gee', 'clone', 'https://github.com/human37/stockbot.git'])
         self.assertIn(
-            'done. cloning repository was successful.',
+            'cloning repository was successful.',
             out,
             'running gee clone on one repository did not give the correct output.'
         )
