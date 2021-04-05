@@ -1,0 +1,25 @@
+name: human37-gee
+version: "1.1"
+summary: CLI repository manager and automation tool 
+description: |
+  If you like temporarily cloning repositories, 
+  then Gee is the tool for you! 
+  It includes the following functionality:
+    $ gee clone <url>
+    $ gee mass <organization> [wildcard]
+    $ gee list
+    $ gee open <index>
+    $ gee done
+    $ gee keep <index> [path]
+    $ gee help
+base: core18
+confinement: classic
+
+parts:
+  human37-gee:
+    plugin: rust
+    source: .
+
+apps:
+  gee:
+    command: bin/gee
