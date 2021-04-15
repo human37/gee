@@ -6,9 +6,9 @@ If you like temporarily cloning repositories, then Gee is the tool for you! It a
 
     $ gee clone <url>
 
-Gee will then download the repository into ```~/.gee/tmp/```. Gee clones them into this directory, in order to implement a temporary repository queue. It allows the user to have a configurable maximum number of repositories they would like Gee to store. And when the user clones enough repositories on the queue to go over that limit, Gee will automatically remove the oldest repository in order to pop it off of the queue. It also allows you the ability to mass clone all of the repositories within a github organization (currently the max is 100). You can run the command:
+Gee will then download the repository into ```~/.gee/tmp/```. Gee clones them into this directory, in order to implement a temporary repository queue. It allows the user to have a configurable maximum number of repositories they would like Gee to store. And when the user clones enough repositories on the queue to go over that limit, Gee will automatically remove the oldest repository in order to pop it off of the queue. It also allows you the ability to mass clone all of the repositories within a github organization (if you don't specify the max it will clone up to 500). You can run the command:
 
-    $ gee mass <organization> [wildcard]
+    $ gee mass <organization> [wildcard] [max]
     
 With the organization being the name of the github organization, and the wildcard being any string. The wildcard is optional, but if you include it, Gee will only clone the repositories within the organization that contain that wildcard. In order to use this functionality, you will need the ```github_token``` key set in your ```.geerc``` file. See the [prerequisites](https://github.com/human37/gee/blob/develop/README.md#prerequisites) section for more information. You can also run the command:
 
