@@ -65,17 +65,28 @@ fn main() {
                 let mut g = gee::Gee::new();
                 g.parse_conf();
                 if g.config.github_token == "" {
-                    println!("you do not have a github personal access token in your '.geerc' file.");
+                    println!(
+                        "you do not have a github personal access token in your '.geerc' file."
+                    );
                     return;
                 }
                 let wildcard = args.value_of("wildcard").unwrap_or("");
-                let repositories =
-                    gee::api::get_repos(&org, &g.config.github_token);
-                let repos_contain =
-                    gee::utils::contains_substring(repositories, wildcard.to_string());
-                let num_repos = repos_contain.len();
-                let full_org_name = String::from(&org) + " [wildcard: '" + wildcard + "']";
-                if !g.repo_on_queue(&full_org_name) {
+                let max_int = args
+                    .value_of("max")
+                    .unwrap_or("500")
+                    .parse::<usize>()
+                    .unwrap();
+                let mut org_with_wildcard = org.to_owned();
+                if wildcard != "" {
+                    org_with_wildcard = String::from(&org) + " [wildcard: '" + wildcard + "']";
+                }
+                if !g.repo_on_queue(&org_with_wildcard) {
+                    let sp = Spinner::new(Spinners::Dots9, "searching... ".into());
+
+                    let repositories = gee::api::get_repos(&org, &g.config.github_token, max_int);
+                    let repos_contain =
+                        gee::utils::contains_substring(repositories, wildcard.to_string());
+                    let num_repos = repos_contain.len();
                     if wildcard != "" {
                         println!(
                             "found {} repositories within {} that match the wildcard '{}'",
@@ -86,7 +97,7 @@ fn main() {
                     }
                     if num_repos > 0 {
                         let mut num_cloned = 1;
-                        let sp = Spinner::new(Spinners::Dots9, "cloning...".into());
+                        sp.message("cloning... ".into());
                         for repo in repos_contain {
                             let status = String::new()
                                 + "cloning... ("
@@ -95,7 +106,7 @@ fn main() {
                                 + &num_repos.to_string()
                                 + ")";
                             sp.message(status);
-                            g.clone_repo_within_org(&repo, &full_org_name)
+                            g.clone_repo_within_org(&repo, &org_with_wildcard)
                                 .expect("could not clone repository");
                             num_cloned += 1;
                         }

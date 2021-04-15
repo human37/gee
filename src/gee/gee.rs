@@ -262,12 +262,10 @@ impl Gee {
     pub fn print_status(self) -> Result<()> {
         let mut index = 1;
         if self.repositories.len() != 0 {
-            println!("==================");
             println!("index   repository");
-            println!("==================");
-            for repo in self.repositories {
-                let url = utils::prettify_url(&repo.url);
-                println!("[ {} ]   {} ", index, url);
+            for i in 0..self.repositories.len() {
+                let url = utils::prettify_url(&self.repositories[i].url);
+                println!("[ {} ] | {} ", index, url);
                 index += 1;
             }
         } else {

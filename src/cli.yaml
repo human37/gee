@@ -37,3 +37,6 @@ subcommands:
         - wildcard:
             help: the wildcard string the repository name must include in order to be cloned
             required: false
+        - max:
+            help: the maximum amount of repositories to clone
+            required: false
