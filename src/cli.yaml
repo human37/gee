@@ -1,5 +1,5 @@
 name: gee
-version: "1.1"
+version: "1.2"
 author: Ammon Taylor <ammonx9@gmail.com>
 about: CLI repository manager and automation tool written in rust.
 subcommands:
