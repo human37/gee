@@ -1,5 +1,6 @@
 # gee
 CLI repository manager and automation tool written in rust.
+![Gee Screenshot](snapshot.png)
 
 ### Overview
 If you like temporarily cloning repositories, then Gee is the tool for you! It allows you to clone any repository on github by running:
